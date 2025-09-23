@@ -1,0 +1,11 @@
+# Archivos y carpetas de Visual Studio
+.vs/
+bin/
+obj/
+*.user
+*.suo
+*.pdb
+*.cache
+*.dbmdl
+*.log
+
