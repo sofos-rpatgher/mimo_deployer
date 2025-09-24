@@ -2,17 +2,20 @@
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 using System.IO;
 using System.Drawing;
 using System.Text.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Newtonsoft.Json;
+using System.Web.Services.Description;
 
 namespace Mimo_Interpreter
 {
     internal class Listener
     {
+        private readonly SynchronizationContext ui;
         private RichTextBox console;
         private string url;
 
@@ -20,7 +23,10 @@ namespace Mimo_Interpreter
         {
             this.url = url;
             this.console = console;
-            startListeningHttp();
+            this.ui = SynchronizationContext.Current ?? new WindowsFormsSynchronizationContext();
+
+            startListeningHttp(); // fire-and-forget, no async void
+        
         }
 
         private async void startListeningHttp()
@@ -55,10 +61,8 @@ namespace Mimo_Interpreter
 
         private void SafeLog(string text)
         {
-            if (console.InvokeRequired)
-                console.BeginInvoke(new Action(() => console.AppendText(text + Environment.NewLine)));
-            else
-                console.AppendText(text + Environment.NewLine);
+            if (console.IsDisposed) return;
+            ui.Post(_ => console.AppendText(text + Environment.NewLine), null);
         }
 
         private async Task ProcessRequest(HttpListenerContext context)
@@ -86,22 +90,24 @@ namespace Mimo_Interpreter
                     using (var reader = new StreamReader(request.InputStream, request.ContentEncoding))
                     {
                         string requestBody = await reader.ReadToEndAsync();
-                        SafeLog("------------------------------------------");
-                        SafeLog("Cuerpo de la petición POST recibido:");
-                        SafeLog(requestBody);
-                        SafeLog("------------------------------------------");
+
 
                         MimoProgram mimo_program = JsonConvert.DeserializeObject<MimoProgram>(requestBody);
-                        SafeLog("Task running: " + mimo_program.batch_iid);
+                        Interpreter interpreter = new Interpreter(this.console, "C:\\Program Files\\SAP\\FrontEnd\\SAPGUI\\sapshcut.exe","RPATGHER","Patgher2003","300");
+                        interpreter.mimo_program = mimo_program;
+                        interpreter.interpret();
+                        
                     }
 
-                    // Build response
-                    string responseString = "POST request received successfully!";
+                    // Build JSON response
+                    var responseObject = new { message = "POST request received successfully!" };
+                    string responseString = JsonConvert.SerializeObject(responseObject);
                     byte[] buffer = Encoding.UTF8.GetBytes(responseString);
 
                     // Response
+                    response.ContentType = "application/json";
                     response.ContentLength64 = buffer.Length;
-                    response.StatusCode = (int)HttpStatusCode.OK; // 200 OK
+                    response.StatusCode = (int)HttpStatusCode.OK;
                     using (Stream output = response.OutputStream)
                     {
                         await output.WriteAsync(buffer, 0, buffer.Length);

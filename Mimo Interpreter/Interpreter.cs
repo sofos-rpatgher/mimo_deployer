@@ -21,8 +21,7 @@ namespace Mimo_Interpreter
     {
         public MimoProgram mimo_program;
         private RichTextBox console;
-        private TextBox textBox1;
-
+        private string sapshcutPath;
         LogHelper logSuccess;
         LogHelper logError;
 
@@ -38,10 +37,10 @@ namespace Mimo_Interpreter
         private string password = "";
         private string client = "";
 
-        public Interpreter(RichTextBox console, TextBox textBox1, string username, string password, string client)
+        public Interpreter(RichTextBox console, string sapshcutPath, string username, string password, string client)
         {
             this.console = console;
-            this.textBox1 = textBox1;
+            this.sapshcutPath = sapshcutPath;
             this.username = username;
             this.password = password;
             this.client = client;
@@ -105,7 +104,7 @@ namespace Mimo_Interpreter
             }
         }
 
-        private void decodeJson(string mimoFilePath)
+        public void decodeJson(string mimoFilePath)
         {
             printMessage("Reading Mimo Program...", writeLog: false);
             if (!File.Exists(mimoFilePath))
@@ -132,7 +131,7 @@ namespace Mimo_Interpreter
                 printMessage("Initiating SAP GUI... ");
                 // TODO: Make this path dynamic so that it can be adjusted when the path is different
                 // string sapshcutPath = @"C:\Program Files\SAP\FrontEnd\SAPGUI\sapshcut.exe";
-                string sapshcutPath = textBox1.Text;
+                
 
                 string connectionName = "S4D";
 
@@ -452,19 +451,15 @@ namespace Mimo_Interpreter
             }
         }
 
-        public void interpret(string mimoFilePath, ProgressBar progressBar)
+        public void interpret( )
         {
-            decodeJson(mimoFilePath);
+     
             logSuccess = new LogHelper(mimo_program.batch_iid, Path.Combine(Application.StartupPath, "Logs", $"B_{mimo_program.batch_id}"), "INFO");
             logError = new LogHelper(mimo_program.batch_iid, Path.Combine(Application.StartupPath, "Logs", $"B_{mimo_program.batch_id}"), "ERROR");
             initiateSAPGUI();
 
 
-            // Initialize the progress bar
-            progressBar.Minimum = 0;
-            progressBar.Maximum = 100;
-            progressBar.Value = 0;
-
+ 
             if (mimo_program == null || session == null)
             {
                 return;

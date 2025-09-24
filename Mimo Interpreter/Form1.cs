@@ -31,7 +31,7 @@ namespace Mimo_Interpreter
             runBtn.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             logsButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
 
-            Listener listener = new Listener("http://+:8000/", console);
+            Listener listener = new Listener("http://localhost:8000/", console);
         }
 
         private void set_Header()
@@ -115,12 +115,12 @@ namespace Mimo_Interpreter
 
         private void password_TextChanged_1(object sender, EventArgs e)
         {
-            usernameStr = username.Text;
+            passwordStr = password.Text;
         }
 
         private void username_TextChanged_1(object sender, EventArgs e)
         {
-            passwordStr = password.Text;
+            usernameStr = username.Text;
         }
 
         private void client_TextChanged_1(object sender, EventArgs e)
@@ -148,8 +148,10 @@ namespace Mimo_Interpreter
         private void runBtn_Click_1(object sender, EventArgs e)
         {
             string filePath = pathBox.Text;
-            interpreter = new Interpreter(console, textBox1, usernameStr, passwordStr, clientStr);
-            interpreter.interpret(filePath, progressBar1);
+            string sapshcutPath = textBox1.Text;
+            interpreter = new Interpreter(console, sapshcutPath, usernameStr, passwordStr, clientStr);
+            interpreter.decodeJson(filePath);
+            interpreter.interpret();
             logsButton.Enabled = true;
         }
 
