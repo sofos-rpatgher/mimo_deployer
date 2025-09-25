@@ -93,10 +93,9 @@ namespace Mimo_Interpreter
 
 
                         MimoProgram mimo_program = JsonConvert.DeserializeObject<MimoProgram>(requestBody);
-                        Interpreter interpreter = new Interpreter(this.console, "C:\\Program Files\\SAP\\FrontEnd\\SAPGUI\\sapshcut.exe","RPATGHER","Patgher2003","300");
+                        Interpreter interpreter = new Interpreter(this.console, "C:\\Program Files\\SAP\\FrontEnd\\SAPGUI\\sapshcut.exe","RPATGHER","Patgher2003$","300");
                         interpreter.mimo_program = mimo_program;
                         interpreter.interpret();
-                        
                     }
 
                     // Build JSON response

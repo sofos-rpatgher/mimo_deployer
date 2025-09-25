@@ -63,10 +63,19 @@ namespace Mimo_Interpreter
 
         public void printMessage(string message = "", string type = "", int aNL = 1, int bNL = 0, bool writeLog = true)
         {
+            // Verificar si se necesita invocar al hilo de la UI
+            if (console.InvokeRequired)
+            {
+                console.Invoke(new Action(() => printMessage(message, type, aNL, bNL, writeLog)));
+                return;
+            }
+
+            // Operaciones de formato y escritura en el control console
             for (int i = 0; i < aNL; i++)
             {
                 console.AppendText(Environment.NewLine);
             }
+
             if (type == "Error")
             {
                 console.SelectionColor = Color.Red;
@@ -98,6 +107,7 @@ namespace Mimo_Interpreter
                 if (writeLog)
                     logSuccess.WriteLog(message, "INFO");
             }
+
             for (int i = 0; i < bNL; i++)
             {
                 console.AppendText(Environment.NewLine);
